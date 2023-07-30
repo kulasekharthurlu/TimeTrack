@@ -18,5 +18,6 @@ public class JdbcTemplateHelper {
 	public <T> List<T> getResults(String query, Class<T> class1){
 		return (List<T>) jdbcTemplate.query(query, new BeanPropertyRowMapper<>(class1));
 	}
+	
 
 }

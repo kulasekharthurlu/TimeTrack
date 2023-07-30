@@ -1,6 +1,14 @@
-.MuiPaper-root{
-    color: blue;
-    .MuiDialogContent-root{
 
+
+
+/* Employee Model*/
+
+.MuiPaper-root{
+   // width: 60em;
+    #responsive-dialog-title{
+        text-align: center;
+    }
+    .MuiDialogContent-root{
+       text-align: center;
     }
 }

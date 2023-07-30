@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.app.timetrack.ServiceImpl.EmployeeServiceImpl.EmployeeDto1;
 import com.app.timetrack.controller.EmployeeController.EmpFilters;
 import com.app.timetrack.entity.Employee;
 
@@ -20,7 +19,9 @@ public interface IEmployeeService {
 
 	Employee getEmployeeById(Long employeeId);
 
-	List<Employee> getAllEmployees();
+	List<Employee> getAllEmployees(Integer pageNumber, Integer pageSize);
 	
-	List<Map<String,Object>>getAllEmployeesByFilters(EmpFilters empFilters);
+	List<Employee> getAllEmployeesByFilters(EmpFilters empFilters);
+
+	Employee findByUserEmail(String username);
 }

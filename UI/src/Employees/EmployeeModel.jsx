@@ -1,96 +1,182 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
-import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import MenuItem from '@mui/material/MenuItem';
+import React, { useState, useEffect, useContext } from "react";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import TextField from "@mui/material/TextField";
+import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
 
-import "./Employee.scss"
-import axios from 'axios';
+import "./Employee.scss";
+
+import EmployeeContext from "../Context/Employee/EmployeeContext";
 
 export default function EmployeeModel(props) {
-    const [open, setOpen] = React.useState(false);
-    const theme = useTheme();
-    const [showPassword, setShowPassword] = React.useState(false);
-    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const { saveEmployee, updateEmployee } = useContext(EmployeeContext);
 
-    const handleClickShowPassword = () => setShowPassword((show) => !show);
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
-    const [data, setData] = React.useState({});
+  const [data, setData] = useState({
+    empId: "",
+    empFirstName: "",
+    empLastName: "",
+    empEmail: "",
+    empPhoneNumber: "",
+    empDOB: "",
+    empGender: "",
+  });
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
+  const [errors, setErrors] = useState({
+    empFirstName: "",
+    empLastName: "",
+    empEmail: "",
+    empDOB: "",
+    empGender: "",
+  });
 
-    const handleClose = () => {
-        setOpen(false);
-    };
-    const currencies = [
-        {
-            value: 'Male',
-            label: 'Male',
-        },
-        {
-            value: 'Female',
-            label: 'Female',
-        },
-        {
-            value: 'Others',
-            label: 'Others',
-        }
-    ];
-    const addData = (e) => {
-        setData({ ...data, [e.target.name]: e.target.value + "" });
-        console.log(data);
+  const clearErrors = () => {
+    setErrors({
+      empFirstName: "",
+      empLastName: "",
+      empEmail: "",
+      empDOB: "",
+      empGender: "",
+    });
+  };
+
+  useEffect(() => {
+    if (props.editEmpData !== undefined && props.editEmpData !== null) {
+      setData({
+        empId: props.editEmpData.empId,
+        empFirstName: props.editEmpData.empFirstName,
+        empLastName: props.editEmpData.empLastName,
+        empEmail: props.editEmpData.empEmail,
+        empPhoneNumber: props.editEmpData.empPhoneNumber,
+        empDOB: props.editEmpData.empDOB,
+        empGender: props.editEmpData.empGender,
+      });
+      clearErrors();
+    } else {
+      setData({
+        empFirstName: "",
+        empLastName: "",
+        empEmail: "",
+        empPhoneNumber: "",
+        empDOB: "",
+        empGender: "",
+      });
+      clearErrors();
     }
+  }, [props.editEmpData]);
 
-    const saveEmployee = () => {
-        axios.post('http://localhost:2023/api/employee/v1/save', data)
-            .then(res => {
-                console.log(res);
-            })
+  const addData = (e) => {
+    setData({ ...data, [e.target.name]: e.target.value + "" });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  const saveEmployeeData = () => {
+    if (validateForm()) {
+      if (data.empId !== "" && data.empId !== undefined) {
+        updateEmployee(data);
+        props.onClose();
+      } else {
+        data.roles = [{ roleName: "EMPLOYEE" }];
+        saveEmployee(data);
+        props.onClose();
+      }
     }
+  };
 
-    return (
-        <div>
-
-            <Dialog
-                fullScreen={fullScreen}
-                open={props.open}
-                onClose={props.onClose}
-                aria-labelledby="responsive-dialog-title"
-            >
-                <DialogTitle id="responsive-dialog-title">
-                    {"Edit Employee"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Employee Form Model
-                    </DialogContentText>
-                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                        <TextField id="outlined-basic" label="FirstName" variant="outlined" name="empFirstName" onChange={(e) => addData(e)} />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                        <TextField id="outlined-basic" label="LastName" variant="outlined" name="empLastName" onChange={(e) => addData(e)} />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                        <TextField id="outlined-basic" label="Email" variant="outlined" name="empEmail" onChange={(e) => addData(e)} />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+  const validateForm = () => {
+    let isValid = true;
+    if (data.empFirstName == "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        empFirstName: "Please enter first name",
+      }));
+      isValid = false;
+    }
+    if (data.empLastName == "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        empLastName: "Please enter last name",
+      }));
+      isValid = false;
+    }
+    if (data.empEmail == "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        empEmail: "Please enter email",
+      }));
+      isValid = false;
+    }
+    if (data.empPhoneNumber == "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        empPhoneNumber: "Please enter phonenumber",
+      }));
+      isValid = false;
+    }
+    if (data.empDOB == "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        empDOB: "Please select DOB",
+      }));
+      isValid = false;
+    }
+    return isValid;
+  };
+  return (
+    <>
+      <div className="empModel">
+        <Dialog
+          open={props.open}
+          onClose={props.onClose}
+          aria-labelledby="responsive-dialog-title"
+        >
+          <DialogTitle id="responsive-dialog-title">
+            {props.editEmpData !== undefined && props.editEmpData !== null
+              ? "Update"
+              : "Add"}{" "}
+            Employee
+          </DialogTitle>
+          <DialogContent>
+            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+              <TextField
+                id="outlined-basic"
+                label="FirstName"
+                variant="outlined"
+                name="empFirstName"
+                value={data.empFirstName}
+                error={!!errors.empFirstName}
+                helperText={errors.empFirstName}
+                onChange={(e) => addData(e)}
+              />
+            </FormControl>
+            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+              <TextField
+                id="outlined-basic"
+                label="LastName"
+                variant="outlined"
+                name="empLastName"
+                value={data.empLastName}
+                error={!!errors.empLastName}
+                helperText={errors.empLastName}
+                onChange={(e) => addData(e)}
+              />
+            </FormControl>
+            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+              <TextField
+                id="outlined-basic"
+                label="Email"
+                variant="outlined"
+                name="empEmail"
+                value={data.empEmail}
+                error={!!errors.empEmail}
+                helperText={errors.empEmail}
+                onChange={(e) => addData(e)}
+              />
+            </FormControl>
+            {/* <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
                         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password"
@@ -111,41 +197,77 @@ export default function EmployeeModel(props) {
                             onChange={(e) => addData(e)}
                             name="empPassword"
                         />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                        <TextField id="outlined-basic" label="PhoneNumber" variant="outlined" name="empPhoneNumber" onChange={(e) => addData(e)} />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                        <TextField id="outlined-basic" type="date" name="empDOB" onChange={(e) => addData(e)} label="DateOfBirth" InputLabelProps={{ shrink: true }} />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                        <TextField
-                            id="outlined-select-gender"
-                            select
-                            label="Select Gender"
-                            onChange={(e) => addData(e)}
-                            name="empGender"
-                            defaultValue=""
-                            InputLabelProps={{ shrink: true }}
-                        >
-                            {currencies.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </FormControl>
-                </DialogContent>
-                <DialogActions>
-
-                    <Button autoFocus onClick={props.onClose}>
-                        Cancel
-                    </Button>
-                    <Button onClick={() => { saveEmployee(); props.onClose() }} autoFocus>
-                        Save
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </div>
-    );
+                    </FormControl> */}
+            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+              <TextField
+                id="outlined-basic"
+                label="PhoneNumber"
+                variant="outlined"
+                name="empPhoneNumber"
+                value={data.empPhoneNumber}
+                error={!!errors.empPhoneNumber}
+                helperText={errors.empPhoneNumber}
+                onChange={(e) => addData(e)}
+              />
+            </FormControl>
+            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+              <TextField
+                id="outlined-basic"
+                type="date"
+                name="empDOB"
+                onChange={(e) => addData(e)}
+                label="DateOfBirth"
+                value={data.empDOB}
+                error={!!errors.empDOB}
+                helperText={errors.empDOB}
+                InputLabelProps={{ shrink: true }}
+              />
+            </FormControl>
+            <FormControl sx={{ m: 1, width: "25ch" }} variant="outlined">
+              <TextField
+                id="outlined-select-gender"
+                select
+                label="Select Gender"
+                onChange={(e) => addData(e)}
+                name="empGender"
+                defaultValue="MALE"
+                value={data.empGender}
+                InputLabelProps={{ shrink: true }}
+              >
+                {data.empGender !== "" ? (
+                  <MenuItem key={data.empGender} value={data.empGender}>
+                    {data.empGender}
+                  </MenuItem>
+                ) : (
+                  [
+                    { value: "MALE", label: "MALE" },
+                    { value: "FEMALE", label: "FEMALE" },
+                  ].map((option) => (
+                    <MenuItem key={option.label} value={option.label}>
+                      {option.label}
+                    </MenuItem>
+                  ))
+                )}
+              </TextField>
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={props.onClose}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                saveEmployeeData();
+              }}
+              autoFocus
+            >
+              {props.editEmpData !== undefined && props.editEmpData !== null
+                ? "Update"
+                : "Save"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </>
+  );
 }
