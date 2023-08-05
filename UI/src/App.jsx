@@ -15,11 +15,22 @@ export default function App() {
       <Router>
         <EmployeeState>
           <Routes>
-            <Route exact path="/" element={<DashBoard />} />
+            <Route exact path="/" element={<Login />} />
             <Route exact path="/login" element={<Login />} />
             <Route exact path="/signup" element={<SignUp />} />
-            <Route exact path="/timelog" element={<TimeLog />} />
-            <Route exact path="/emps" element={<Employees />} />
+
+            <Route
+              element={<PrivateRoute component={DashBoard} />}
+              path="/DashBoard"
+            />
+            <Route
+              element={<PrivateRoute component={TimeLog} />}
+              path="/timeLog"
+            />
+            <Route
+              element={<PrivateRoute component={Employees} />}
+              path="/emps"
+            />
           </Routes>
         </EmployeeState>
       </Router>
