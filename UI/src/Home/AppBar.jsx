@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -7,16 +8,23 @@ import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-
+import AppConstants from "../Utils/AppConstants";
 import SideBar from "./SideBar";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 
 export default function ButtonAppBar() {
+  const navigate = useNavigate();
   const [openSideBar, setOpenSideBar] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(false);
 
   const handleClose = () => {
     setAnchorEl(false);
+  };
+
+  const handleLogOut = () => {
+    localStorage.setItem("isAuthenticated", false);
+    AppConstants.LOCAL_FORAGE.removeItem("token");
+    navigate("/");
   };
 
   return (
@@ -64,6 +72,7 @@ export default function ButtonAppBar() {
           >
             <MenuItem onClick={handleClose}>Profile</MenuItem>
             <MenuItem onClick={handleClose}>My account</MenuItem>
+            <MenuItem onClick={handleLogOut}>LogOut</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>

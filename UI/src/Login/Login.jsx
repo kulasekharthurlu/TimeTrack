@@ -2,7 +2,6 @@ import React, { useState } from "react";
 
 import { Container, Typography, TextField, Button, Grid } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import EmployeeApiCall from "../ApiCalls/EmployeeApi";
 import AppConstants from "../Utils/AppConstants";
 

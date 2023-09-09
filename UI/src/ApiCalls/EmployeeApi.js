@@ -17,13 +17,12 @@ const EmployeeApiCall = {
   getAllEmployeess: async (pageNumber, pageSize) => {
     const token = await GetAuthToken();
     return axios.get(
-      `${AppConstants.BaseURL}/api/employee/v1/getall?pageNumber=${pageNumber}&pageSize=${pageSize}`
-      // {
-      //   headers: {
-
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // }
+      `${AppConstants.BaseURL}/api/employee/v1/getall?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
   },
   loginApi: async (data) => {
